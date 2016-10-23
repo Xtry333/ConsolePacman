@@ -107,7 +107,7 @@ namespace ConsolePacman
                 }
                 fps.Start();
                 fps.Update();
-                printAt(rnd.Next(0, Console.WindowWidth - 1), rnd.Next(0, Console.WindowHeight), rnd.Next(0, 9).ToString());
+                //printAt(rnd.Next(0, Console.WindowWidth - 1), rnd.Next(0, Console.WindowHeight), rnd.Next(0, 9).ToString());
                 //printAt(Console.WindowWidth - 1, Console.WindowHeight, "a");
                 printAt(0, 2, "Fps: " + fps.fps + "/" + fps.maxFps + "   \n");
             }
