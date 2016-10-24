@@ -18,7 +18,48 @@ namespace ConsolePacman
 
     class Ghost
     {
+        int x = Program.Random.Next(0, Console.WindowWidth/2);
+        int y = Program.Random.Next(0, Console.WindowHeight);
+        int direction = Program.Random.Next(0, 3);
+        int timer = 0;
 
+        public void Update()
+        {
+            if (timer > 0) timer--;
+            if (timer <= 0)
+            {
+                int rnd = Program.Random.Next(0, 100);
+                int c = 33;
+                if (rnd > 100 - c/2) { direction++; }
+                if (rnd < c/2) { direction--; }
+
+                timer = Program.Random.Next(0, 20);
+            }
+
+            if (direction > 3) { direction -= 4; }
+            if (direction < 0) { direction += 4; }
+            Program.printAt(2 * x, y, Ch.Empty + Ch.Empty);
+            switch (direction)
+            {
+                case 0: x++; break;
+                case 1: y++; break;
+                case 2: x--; break;
+                case 3: y--; break;
+            }
+            if (x < 0) { direction += 2; }
+            if (2 * x > Console.WindowWidth - 1) { direction += 2; }
+            if (y < 0) { direction += 2; }
+            if (y > Console.WindowHeight - 1) { direction += 2; }
+            Program.printAt(2 * x, y, Ch.Half + Ch.Half);
+        }
+    }
+
+    class PacMan
+    {
+        public void Update()
+        {
+
+        }
     }
 
     class FrameControl
@@ -75,12 +116,17 @@ namespace ConsolePacman
             }
         }
     }
-    
+
     class Program
     {
-        static FrameControl fps = new FrameControl();
-        static Random rnd = new Random();
-        static bool printAt(int x, int y, string str) // Sets Cursor at x, y and writes given string
+        static FrameControl Fps = new FrameControl();
+        public static Random Random = new Random();
+        static PacMan PacMan = new PacMan();
+        static Ghost[] Ghost = new Ghost[5];
+        
+        public static string[,] boardTiles = new string[Console.WindowWidth - 1, Console.WindowHeight - 1];
+
+        public static bool printAt(int x, int y, string str, bool addToBoard = false) // Sets Cursor at x, y and writes given string
         {
             if ((x >= 0) && (x <= Console.WindowWidth - 1) && (y >= 0) && (y <= Console.WindowHeight - 1))
             {
@@ -95,8 +141,10 @@ namespace ConsolePacman
             Console.Title = "Pac Man";
             Console.CursorVisible = false;
 
+            for (int i = 0; i < Ghost.Length; ++i) { Ghost[i] = new Ghost(); }
+
             bool quit = false;
-            fps.maxFps = 0;
+            Fps.maxFps = 15;
             while (!quit)
             {
                 if (Console.KeyAvailable)
@@ -105,14 +153,22 @@ namespace ConsolePacman
                     if (keyInfo.Key == ConsoleKey.Escape) { quit = true; }
                     if (keyInfo.Key == ConsoleKey.C) { Console.Clear(); }
                 }
-                fps.Start();
-                fps.Update();
-                //printAt(rnd.Next(0, Console.WindowWidth - 1), rnd.Next(0, Console.WindowHeight), rnd.Next(0, 9).ToString());
+                Fps.Start();
+
+                PacMan.Update();
+                foreach (Ghost Gh in Ghost) { Gh.Update(); }
+                //for (int i = 0; i < Ghost.Length; i++) { Ghost[i].Update(); }
+
+                //Fps.Delay(66);
+                //Thread.Sleep(120);
+                Fps.Update();
+                //Console.Clear();
+                printAt(0, 2, "Fps: " + Fps.fps + "   \n");
+                //printAt(Random.Next(0, Console.WindowWidth - 1), Random.Next(0, Console.WindowHeight), Random.Next(0, 9).ToString());
                 //printAt(Console.WindowWidth - 1, Console.WindowHeight, "a");
-                printAt(0, 2, "Fps: " + fps.fps + "/" + fps.maxFps + "   \n");
             }
             Console.WriteLine("Exiting...");
-            fps.Delay(100);
+            Fps.Delay(100);
         }
     }
 }
